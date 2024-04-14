@@ -44,12 +44,13 @@ petard_line: list[Event] = [
 
 militia_line: list[Event] = [
     # @formatter:off
+    Create(UnitInfo.MILITIA,                time='00:00', rate=1),
     Create(UnitInfo.MILITIA,                time='03:00', rate=3),
     Create(UnitInfo.MILITIA,                time='06:00', rate=6),
-    Create(UnitInfo.MILITIA,                time='10:00', rate=10),
 
     ResearchDependency(TechInfo.FEUDAL_AGE),
     Research(TechInfo.MAN_AT_ARMS,          time='01:00'),
+    Create(UnitInfo.MILITIA,                time='01:00', rate=8),
 
     ResearchDependency(TechInfo.CASTLE_AGE),
     Research(TechInfo.LONG_SWORDSMAN,       time='02:00'),
@@ -65,15 +66,15 @@ militia_line: list[Event] = [
 archer_line: list[Event] = [
     # @formatter:off
     ResearchDependency(TechInfo.FEUDAL_AGE),
-    Create(UnitInfo.ARCHER,        time='00:00', rate=3),
-    Create(UnitInfo.ARCHER,        time='02:00', rate=6),
-    Create(UnitInfo.ARCHER,        time='04:00', rate=8),
-    Create(UnitInfo.ARCHER,        time='10:00', rate=12),
+    Create(UnitInfo.ARCHER,        time='00:00', rate=2),
+    Create(UnitInfo.ARCHER,        time='02:00', rate=4),
+    Create(UnitInfo.ARCHER,        time='04:00', rate=6),
+    Create(UnitInfo.ARCHER,        time='10:00', rate=9),
 
     ResearchDependency(TechInfo.CASTLE_AGE),
     Research(TechInfo.CROSSBOWMAN, time='00:00'),
-    Create(UnitInfo.ARCHER,        time='00:00', rate=15),
-    Create(UnitInfo.ARCHER,        time='05:00', rate=20),
+    Create(UnitInfo.ARCHER,        time='00:00', rate=12),
+    Create(UnitInfo.ARCHER,        time='05:00', rate=15),
 
     ResearchDependency(TechInfo.IMPERIAL_AGE),
     Research(TechInfo.ARBALESTER,  time='02:00'),
