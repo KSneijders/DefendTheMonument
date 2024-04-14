@@ -1,10 +1,11 @@
 from pathlib import Path
 
 from AoE2ScenarioParser.datasets.buildings import BuildingInfo
+from AoE2ScenarioParser.datasets.other import OtherInfo
 from AoE2ScenarioParser.datasets.players import PlayerId
 from AoE2ScenarioParser.datasets.techs import TechInfo
 from AoE2ScenarioParser.datasets.units import UnitInfo
-from AoE2ScenarioParser.helper.pretty_format import pretty_format_name
+from AoE2ScenarioParser.helper.pretty_format import pretty_format_name, pretty_format_dict
 from AoE2ScenarioParser.objects.data_objects.trigger import Trigger
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
 
@@ -19,6 +20,7 @@ class SpawnerBuilder:
 
         self.timeline: dict[int, list[Event]] = {}
         self.research_times: dict[int, int] = {}
+        self.unit_spawn_times: dict[int, list[tuple[int, int]]] = {}
 
         self.units: set[tuple[UnitInfo, BuildingInfo]] = set()
         self.units_by_building: dict[BuildingInfo, set[UnitInfo]] = {}
@@ -182,13 +184,6 @@ class SpawnerBuilder:
                 f'UNIT_QUEUE_ARRAY = xsArrayCreateInt({number_of_units}, 0, "__unit_queue_548002659");',
                 f'UNIT_SPAWN_CHANCE_ARRAY = xsArrayCreateInt({number_of_units}, 0, "__unit_spawn_chance_array_346179758");',
                 f'',
-                f'xsArraySetInt(UNIT_SPAWN_CHANCE_ARRAY, MILITIA, 10);',
-                f'xsArraySetInt(UNIT_SPAWN_CHANCE_ARRAY, ARCHER, 10);',
-                f'xsArraySetInt(UNIT_SPAWN_CHANCE_ARRAY, SKIRMISHER, 10);',
-                f'xsArraySetInt(UNIT_SPAWN_CHANCE_ARRAY, SCOUT_CAVALRY, 10);',
-                f'xsArraySetInt(UNIT_SPAWN_CHANCE_ARRAY, PETARD, 10);',
-                f'xsArraySetInt(UNIT_SPAWN_CHANCE_ARRAY, KNIGHT, 10);',
-                f'',
                 *xs_fill_arrays,
                 f'xsDisableSelf();',
                 f'xsEnableRule("main_spawn_loop__456879123");'
@@ -220,15 +215,32 @@ class SpawnerBuilder:
             tech = TechInfo.from_id(research)
             name = pretty_format_name(tech.name)
 
-            trigger = tm.add_trigger(f'Research {tech.name} @ {time}')
+            trigger = tm.add_trigger(f'Research {name} @ {time}')
             trigger.new_condition.timer(time)
             trigger.new_effect.research_technology(PlayerId.EIGHT, technology=tech.ID)
 
             if tech in (TechInfo.FEUDAL_AGE, TechInfo.CASTLE_AGE, TechInfo.IMPERIAL_AGE):
-                trigger.new_effect.display_instructions(tech.ID, PlayerId.EIGHT, message=f"Reached the {name}!")
+                trigger.new_effect.display_instructions(OtherInfo.SIGN.ID, PlayerId.EIGHT, message=f"<ORANGE>Player 8 reached the {name}!")
+
+        for unit, spawns in self.unit_spawn_times.items():
+            unit = UnitInfo.from_id(unit)
+            name = unit.name.lower()
+
+            for (time, rate) in spawns:
+                trigger = tm.add_trigger(f'Spawn {rate} {name}/min @ {time}')
+                trigger.new_condition.timer(time)
+
+                func = (
+                    f'void __spawn_{rate}_{name}_at_{time}() {{'
+                    f'xsArraySetInt(UNIT_SPAWN_CHANCE_ARRAY, {unit.name}, {rate});'
+                    f'}}'
+                )
+
+                trigger.new_effect.script_call(message=func)
 
     def _initialize(self):
         research_times: dict[int, int] = {}
+        unit_spawn_times: dict[int, list[tuple[int, int]]] = {}
         timeline: dict[int, list[Event]] = {}
 
         for building_sections in self.sections.values():
@@ -241,6 +253,7 @@ class SpawnerBuilder:
                         research_times[event.tech.ID] = time + dependency_time_offset
                     elif isinstance(event, Create):
                         time = Time.to_seconds(event.time)
+                        unit_spawn_times.setdefault(event.unit.ID, []).append((time + dependency_time_offset, event.rate))
                     elif isinstance(event, ResearchDependency):
                         if event.tech.ID not in research_times:
                             raise ValueError(f'Research dependency not found for {event.tech}')
@@ -255,6 +268,7 @@ class SpawnerBuilder:
 
         self.timeline = timeline
         self.research_times = research_times
+        self.unit_spawn_times = unit_spawn_times
 
         units: set[tuple[UnitInfo, BuildingInfo]] = set()
         units_by_building: dict[BuildingInfo, set[UnitInfo]] = {}
@@ -265,6 +279,7 @@ class SpawnerBuilder:
                     if isinstance(event, Create):
                         units.add((event.unit, building))
                         units_by_building.setdefault(building, set()).add(event.unit)
+
         self.units = units
         self.units_by_building = units_by_building
 
@@ -272,5 +287,15 @@ class SpawnerBuilder:
         sorted_times = sorted(self.timeline.keys())
         for time in sorted_times:
             print(f"> Time {Time.from_seconds(time)}")
+
+            researches, creations = [], []
             for event in self.timeline[time]:
-                print(f"    {event}")
+                if isinstance(event, Research):
+                    researches.append(event)
+                elif isinstance(event, Create):
+                    creations.append(event)
+
+            for research in researches:
+                print(f"    {research}")
+            for creation in creations:
+                print(f"    {creation}")
