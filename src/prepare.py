@@ -45,7 +45,7 @@ asr = AoE2ScenarioRms(scenario)
 # ####### UNITS ######## #
 
 CLEAR_AREA = 18
-NO_BUILD_AREA = 4
+NO_BUILD_AREA = 6
 
 # Clear all animals, Player units and relics from the map
 ScenarioUtil.clear(scenario, ObjectClear.ANIMAL_OBJECTS | ObjectClear.PLAYERS | ObjectClear.RELICS)
@@ -54,7 +54,7 @@ ScenarioUtil.clear(scenario, ObjectClear.ANIMAL_OBJECTS | ObjectClear.PLAYERS | 
 area = scenario.new.area().select_entire_map()
 
 center = area.copy().size(1).expand(CLEAR_AREA)
-center_no_build = area.copy().select_entire_map().size(1).expand(NO_BUILD_AREA)
+center_no_build = area.copy().select_entire_map().size(0).expand(NO_BUILD_AREA)
 
 for unit in um.get_units_in_area(**center.to_dict(prefix='')):
     um.remove_unit(unit=unit)
@@ -63,7 +63,8 @@ center_1x1 = center.copy().size(1)
 center_tile = center_1x1.corner1
 center_tile_offset = center_1x1.copy().center(center_tile.x - 1, center_tile.y - 1).corner1
 
-um.add_unit(PlayerId.GAIA, unit_const=BuildingInfo.MONUMENT.ID, tile=center_tile)
+# TODO: !!!!!!! Make NOT DELETABLE !!!!!!!
+um.add_unit(PlayerId.ONE, unit_const=BuildingInfo.TEMPLE_OF_HEAVEN.ID, x=center_tile.x, y=center_tile.y)
 
 villager_spawn_distance = CLEAR_AREA * .8
 
