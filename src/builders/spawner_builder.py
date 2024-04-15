@@ -5,7 +5,7 @@ from AoE2ScenarioParser.datasets.other import OtherInfo
 from AoE2ScenarioParser.datasets.players import PlayerId
 from AoE2ScenarioParser.datasets.techs import TechInfo
 from AoE2ScenarioParser.datasets.units import UnitInfo
-from AoE2ScenarioParser.helper.pretty_format import pretty_format_name, pretty_format_dict
+from AoE2ScenarioParser.helper.pretty_format import pretty_format_name
 from AoE2ScenarioParser.objects.data_objects.trigger import Trigger
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
 

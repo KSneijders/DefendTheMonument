@@ -22,7 +22,7 @@ town_builder.apply(scenario)
 spawner_builder = SpawnerBuilder(sections)
 spawner_builder.apply(scenario)
 
-# ...
+# Add forced movement
 movement_builder = MovementBuilder()
 movement_builder.apply(scenario)
 
