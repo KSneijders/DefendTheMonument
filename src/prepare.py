@@ -143,6 +143,7 @@ set_start_res_trigger.new_condition.timer(1)
 message = ("      STARTING RESOURCES WERE NOT SET TO 'LOW'!\n \n"
            "                    Defaulting everyone to base resource.\n"
            "This will be incorrect for some civs, a restart is recommended.")
+set_start_res_trigger.new_effect.deactivate_trigger(default_res_check_trigger.trigger_id)
 set_start_res_trigger.new_effect.display_instructions(instruction_panel_position=PanelLocation.CENTER, message=message)
 
 # Create trigger to add TC resources to everyone
