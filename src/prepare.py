@@ -176,10 +176,21 @@ pm.set_diplomacy_teams(players, diplomacy=DiplomacyState.ALLY)
 
 # Set everyone to ENEMY for p8
 pm.players[PlayerId.EIGHT].set_player_diplomacy(players, diplomacy=DiplomacyState.ENEMY)
-pm.players[PlayerId.EIGHT].wood = 99999999
-pm.players[PlayerId.EIGHT].food = 99999999
-pm.players[PlayerId.EIGHT].gold = 99999999
-pm.players[PlayerId.EIGHT].stone = 99999999
+
+resources = [
+    Attribute.WOOD_STORAGE,
+    Attribute.FOOD_STORAGE,
+    Attribute.GOLD_STORAGE,
+    Attribute.STONE_STORAGE,
+]
+
+for resource in resources:
+    name = resource.name.split('_')[0]
+
+    trigger = tm.add_trigger(f"GIVE P8 {name}", looping=True)
+    trigger.new_condition.accumulate_attribute(quantity=100_000, attribute=resource, source_player=PlayerId.EIGHT, inverted=True)
+    trigger.new_effect.tribute(-200_000, resource, PlayerId.EIGHT, PlayerId.GAIA)
+
 pm.players[PlayerId.EIGHT].population_cap = 1000
 
 for player in PlayerId.all(exclude_gaia=True):
