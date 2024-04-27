@@ -2,7 +2,10 @@ import math
 
 from AoE2ScenarioParser.datasets.buildings import BuildingInfo
 from AoE2ScenarioParser.datasets.players import PlayerId
+from AoE2ScenarioParser.objects.data_objects.unit import Unit
 from AoE2ScenarioParser.scenarios.aoe2_scenario import AoE2Scenario
+
+CLOSE_TARGET_AREA = 20
 
 
 class MovementBuilder:
@@ -10,18 +13,22 @@ class MovementBuilder:
         pass
 
     def apply(self, scenario: AoE2Scenario) -> None:
-        um, tm = scenario.unit_manager, scenario.trigger_manager
-
-        CLOSE_TARGET_AREA = 20
+        um = scenario.unit_manager
 
         targets = um.filter_units_by_const(unit_consts=[BuildingInfo.TEMPLE_OF_HEAVEN.ID], player_list=[PlayerId.ONE])
         target = targets[0]
 
+        # self._map_movement_loop(scenario, target)
+        self._close_movement_loop(scenario, target)
+
+    def _map_movement_loop(self, scenario: AoE2Scenario, target: Unit) -> None:
+        tm = scenario.trigger_manager
+
         map_size = scenario.map_manager.map_size
         trigger = tm.add_trigger('Movement loop', looping=True)
-        trigger.new_condition.timer(60)
+        trigger.new_condition.timer(10)
 
-        block_size = 13
+        block_size = 25
         for x in range(0, map_size, block_size):
             for y in range(0, map_size, block_size):
                 trigger.new_effect.attack_move(
@@ -33,6 +40,9 @@ class MovementBuilder:
                     area_x2=min(map_size, x + block_size - 1),
                     area_y2=min(map_size, y + block_size - 1),
                 )
+
+    def _close_movement_loop(self, scenario: AoE2Scenario, target: Unit) -> None:
+        tm = scenario.trigger_manager
 
         center_area = scenario.new.area().size(CLOSE_TARGET_AREA)
 
