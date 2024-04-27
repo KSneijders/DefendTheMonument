@@ -1,6 +1,6 @@
 from AoE2ScenarioParser.datasets.buildings import BuildingInfo
 
-from src.types.types import AiBuildingDetails, TownBuildingSpawnAttempts
+from src.implement.types.types import AiBuildingDetails, TownBuildingSpawnAttempts
 
 ai_sws_buildings_spawns: list[AiBuildingDetails] = [
     (BuildingInfo.SIEGE_WORKSHOP, 4, 6),

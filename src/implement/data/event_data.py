@@ -2,9 +2,9 @@ from AoE2ScenarioParser.datasets.buildings import BuildingInfo
 from AoE2ScenarioParser.datasets.techs import TechInfo
 from AoE2ScenarioParser.datasets.units import UnitInfo
 
-from src.builders.spawner_builder import SpawnerBuilder
-from src.events.events import Research, Create, ResearchDependency, Event
-from src.types.types import SectionType
+from src.implement.builders.spawner_builder import SpawnerBuilder
+from src.implement.events.events import Research, ResearchDependency, Create, Event
+from src.implement.types.types import SectionType
 
 ages: list[Event] = [
     # @formatter:off

@@ -15,7 +15,7 @@ from AoE2ScenarioRms.debug import ApplyXsPrint
 from AoE2ScenarioRms.flags import ObjectClear, ObjectMark
 from AoE2ScenarioRms.util import ScenarioUtil, GridMapFactory
 
-from local_config import folder_de
+from src.local_config import folder_de
 from src.prepare.rms import create_objects_config
 from src.support.values import orientations
 

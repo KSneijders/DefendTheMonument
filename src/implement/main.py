@@ -1,11 +1,11 @@
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
 
-from src.builders.movement_builder import MovementBuilder
-from src.builders.spawner_builder import SpawnerBuilder
-from src.builders.town_builder import TownBuilder
-from src.builders.victory_builder import VictoryBuilder
-from src.data.event_data import sections
-from src.data.town_data import spawn_attempts
+from src.implement.builders.movement_builder import MovementBuilder
+from src.implement.builders.spawner_builder import SpawnerBuilder
+from src.implement.builders.town_builder import TownBuilder
+from src.implement.builders.victory_builder import VictoryBuilder
+from src.implement.data.event_data import sections
+from src.implement.data.town_data import spawn_attempts
 from src.local_config import folder_de
 
 filename = "!prepared_defend1"

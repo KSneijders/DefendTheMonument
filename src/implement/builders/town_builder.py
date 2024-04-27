@@ -10,7 +10,7 @@ from AoE2ScenarioParser.objects.support.area import Area
 from AoE2ScenarioParser.objects.support.tile import Tile
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
 
-from src.types.types import TownBuildingSpawnAttempts, AiBuildingDetails
+from src.implement.types.types import TownBuildingSpawnAttempts, AiBuildingDetails
 
 
 class TownBuilder:
