@@ -10,9 +10,14 @@ from AoE2ScenarioParser.datasets.terrains import TerrainId
 from AoE2ScenarioParser.datasets.trigger_lists import DiplomacyState, VisibilityState, Attribute, PanelLocation
 from AoE2ScenarioParser.datasets.units import UnitInfo
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
+from AoE2ScenarioParser.sections.aoe2_file_section import SectionName
 from AoE2ScenarioRms import AoE2ScenarioRms
-from AoE2ScenarioRms.flags import ObjectClear
-from AoE2ScenarioRms.util import ScenarioUtil
+from AoE2ScenarioRms.debug import ApplyBlockedAsBlack, ApplyXsPrint
+from AoE2ScenarioRms.debug.apply_state_as_black import ApplyStateAsBlack
+from AoE2ScenarioRms.enums import GroupingMethod
+from AoE2ScenarioRms.flags import ObjectClear, TerrainMark, ObjectMark
+from AoE2ScenarioRms.rms import CreateObjectConfig
+from AoE2ScenarioRms.util import ScenarioUtil, GridMapFactory
 
 from local_config import folder_de
 from src.support.values import orientations
@@ -40,15 +45,13 @@ scenario = AoE2DEScenario.from_file(f"{folder_de}{filename}.aoe2scenario")
 tm, um, mm, xm, pm, msm = scenario.trigger_manager, scenario.unit_manager, scenario.map_manager, scenario.xs_manager, \
     scenario.player_manager, scenario.message_manager
 
-asr = AoE2ScenarioRms(scenario)
-
 # ####### UNITS ######## #
 
-CLEAR_AREA = 18
+CLEAR_AREA = 24
 NO_BUILD_AREA = 6
 
 # Clear all animals, Player units and relics from the map
-ScenarioUtil.clear(scenario, ObjectClear.ANIMAL_OBJECTS | ObjectClear.PLAYERS | ObjectClear.RELICS)
+ScenarioUtil.clear(scenario, ObjectClear.ANIMAL_OBJECTS | ObjectClear.PLAYERS | ObjectClear.RESOURCE_OBJECTS)
 
 # Get area object for the scenario
 area = scenario.new.area().select_entire_map()
@@ -75,22 +78,37 @@ for tile in center_large.to_coords():
     for player in players:
         um.add_unit(player, unit_const=OtherInfo.MAP_REVEALER_GIANT.ID, tile=tile)
 
-trigger = tm.add_trigger('Remove map revealers & allied vision')
+map_revealers_trigger = tm.add_trigger('Remove map revealers & allied vision')
 for player in players:
-    trigger.new_effect.remove_object(OtherInfo.MAP_REVEALER_GIANT.ID, player, **coords)
+    map_revealers_trigger.new_effect.remove_object(OtherInfo.MAP_REVEALER_GIANT.ID, player, **coords)
+
 
 for player in players:
     for target in players:
         if player == target:
             continue
-        trigger.new_effect.set_player_visibility(player, target, VisibilityState.VISIBLE)
+        map_revealers_trigger.new_effect.set_player_visibility(player, target, VisibilityState.VISIBLE)
 
+change_view_trigger = tm.add_trigger('Change view trigger')
 for player in players:
     um.add_unit(player, unit_const=OtherInfo.MAP_REVEALER_GIANT.ID, tile=center_tile)
-    # um.add_unit(player, unit_const=UnitInfo.HORSE_A.ID, tile=center_tile_offset)
 
     x = center_tile.x + (orientations[player][0] * villager_spawn_distance)
     y = center_tile.y + (orientations[player][1] * villager_spawn_distance)
+
+    # Nothing works...
+    # pm.players[player].initial_camera_x = math.floor(x)
+    # pm.players[player].initial_camera_y = math.floor(y)
+    # scenario.sections[SectionName.UNITS.value].player_data_3[player].editor_camera_x = math.floor(x)
+    # scenario.sections[SectionName.UNITS.value].player_data_3[player].editor_camera_y = math.floor(y)
+
+    change_view_trigger.new_effect.change_view(
+        quantity=0,
+        source_player=player,
+        location_x=math.floor(x),
+        location_y=math.floor(y),
+    )
+
     for i in range(len(orientations)):
         xoffset = orientations[i][0] / 2
         yoffset = orientations[i][1] / 2
@@ -101,8 +119,7 @@ for player in players:
     starting_units_per_player = [
         (UnitInfo.JAVELINA.ID, 1, PlayerId.GAIA),
         (UnitInfo.JAVELINA.ID, 1, PlayerId.GAIA),
-        (UnitInfo.DEER.ID, 4, PlayerId.GAIA),
-        (UnitInfo.SHEEP.ID, 6, None),
+        (UnitInfo.SHEEP.ID, 8, None),
     ]
 
     for unit, repeat, target_player in starting_units_per_player:
@@ -122,8 +139,8 @@ for player in players:
         for i in range(repeat):
             xoffset, yoffset = orientations_copy[i]
 
-            fx = x + sx + (xoffset / 1.3)
-            fy = y + sy + (yoffset / 1.3)
+            fx = x + sx + (xoffset / 1.4)
+            fy = y + sy + (yoffset / 1.4)
 
             um.add_unit(player=target_player, unit_const=unit, x=fx, y=fy, rotation=_random.random() * math.pi * 2)
 
@@ -189,9 +206,9 @@ resources = [
 for resource in resources:
     name = resource.name.split('_')[0]
 
-    trigger = tm.add_trigger(f"GIVE P8 {name}", looping=True)
-    trigger.new_condition.accumulate_attribute(quantity=100_000, attribute=resource, source_player=PlayerId.EIGHT, inverted=True)
-    trigger.new_effect.tribute(-200_000, resource, PlayerId.EIGHT, PlayerId.GAIA)
+    map_revealers_trigger = tm.add_trigger(f"GIVE P8 {name}", looping=True)
+    map_revealers_trigger.new_condition.accumulate_attribute(quantity=100_000, attribute=resource, source_player=PlayerId.EIGHT, inverted=True)
+    map_revealers_trigger.new_effect.tribute(-200_000, resource, PlayerId.EIGHT, PlayerId.GAIA)
 
 pm.players[PlayerId.EIGHT].population_cap = 1000
 
@@ -205,13 +222,66 @@ for terrain in center_no_build.to_coords(as_terrain=True):
     terrain.layer = terrain.layer if terrain.layer != -1 else terrain.terrain_id
     terrain.terrain_id = TerrainId.ROCK_1  # Non-buildable
 
-mm.set_elevation(0, **center.copy().expand(5).to_dict(prefix=''))
+mm.set_elevation(0, **center.copy().expand(10).to_dict(prefix=''))
 
-# ####### ENEMY SPAWN ######## #
+# ####### RANDOM RESOURCE SPAWNING ######## #
 
-# area_edge = area.copy().use_only_edge(line_width=12)
-# for terrain in area_edge.to_coords(as_terrain=True):
-#     terrain.layer = terrain.layer if terrain.layer != -1 else terrain.terrain_id
-#     terrain.terrain_id = TerrainId.ROCK_1  # Non-buildable
+grid_map = GridMapFactory.block(
+    scenario=scenario,
+    object_marks=ObjectMark.TREES | ObjectMark.CLIFFS,
+    area=scenario.new.area().select_entire_map().use_only_edge(line_width=math.ceil(scenario.map_manager.map_size / 8))
+)
+
+create_objects_config: list[CreateObjectConfig] = [
+    CreateObjectConfig(
+        name='gold',
+        const=OtherInfo.GOLD_MINE.ID,
+        grouping=GroupingMethod.TIGHT,
+        number_of_objects=(4, 6),
+        temp_min_distance_group_placement=14,
+        min_distance_group_placement=4,
+        _max_potential_group_count=150,
+    ),
+    CreateObjectConfig(
+        name='stone',
+        const=OtherInfo.STONE_MINE.ID,
+        grouping=GroupingMethod.TIGHT,
+        number_of_objects=(3, 4),
+        temp_min_distance_group_placement=16,
+        min_distance_group_placement=4,
+        _max_potential_group_count=150,
+    ),
+    CreateObjectConfig(
+        name='berries',
+        const=OtherInfo.FORAGE_BUSH.ID,
+        grouping=GroupingMethod.TIGHT,
+        number_of_objects=(5, 6),
+        temp_min_distance_group_placement=22,
+        min_distance_group_placement=5,
+        _max_potential_group_count=60,
+    ),
+    CreateObjectConfig(
+        name='deer',
+        const=UnitInfo.DEER.ID,
+        grouping=GroupingMethod.LOOSE,
+        number_of_objects=(3, 4),
+        temp_min_distance_group_placement=20,
+        min_distance_group_placement=3,
+        _max_potential_group_count=60,
+    ),
+    CreateObjectConfig(
+        name='relic',
+        const=OtherInfo.RELIC.ID,
+        number_of_objects=1,
+        temp_min_distance_group_placement=26,
+        min_distance_group_placement=1,
+        _max_potential_group_count=20,
+    ),
+]
+
+asr = AoE2ScenarioRms(scenario)
+asr.create_objects(create_objects_config, grid_map)
+
+ApplyXsPrint(asr)
 
 scenario.write_to_file(f"{folder_de}!prepared_{filename}.aoe2scenario")
