@@ -10,16 +10,13 @@ from AoE2ScenarioParser.datasets.terrains import TerrainId
 from AoE2ScenarioParser.datasets.trigger_lists import DiplomacyState, VisibilityState, Attribute, PanelLocation
 from AoE2ScenarioParser.datasets.units import UnitInfo
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
-from AoE2ScenarioParser.sections.aoe2_file_section import SectionName
 from AoE2ScenarioRms import AoE2ScenarioRms
-from AoE2ScenarioRms.debug import ApplyBlockedAsBlack, ApplyXsPrint
-from AoE2ScenarioRms.debug.apply_state_as_black import ApplyStateAsBlack
-from AoE2ScenarioRms.enums import GroupingMethod
-from AoE2ScenarioRms.flags import ObjectClear, TerrainMark, ObjectMark
-from AoE2ScenarioRms.rms import CreateObjectConfig
+from AoE2ScenarioRms.debug import ApplyXsPrint
+from AoE2ScenarioRms.flags import ObjectClear, ObjectMark
 from AoE2ScenarioRms.util import ScenarioUtil, GridMapFactory
 
 from local_config import folder_de
+from src.prepare.rms import create_objects_config
 from src.support.values import orientations
 
 if __name__ != '__main__':
@@ -162,7 +159,7 @@ message = ("      STARTING RESOURCES WERE NOT SET TO 'LOW'!\n \n"
            "                    Defaulting everyone to base resource.\n"
            "This will be incorrect for some civs, a restart is recommended.")
 set_start_res_trigger.new_effect.deactivate_trigger(default_res_check_trigger.trigger_id)
-set_start_res_trigger.new_effect.display_instructions(instruction_panel_position=PanelLocation.CENTER, message=message)
+set_start_res_trigger.new_effect.display_instructions(instruction_panel_position=PanelLocation.TOP, message=message)
 
 # Create trigger to add TC resources to everyone
 add_tc_res_trigger = tm.add_trigger('ADD TC RESOURCES', enabled=False)
@@ -231,53 +228,6 @@ grid_map = GridMapFactory.block(
     object_marks=ObjectMark.TREES | ObjectMark.CLIFFS,
     area=scenario.new.area().select_entire_map().use_only_edge(line_width=math.ceil(scenario.map_manager.map_size / 8))
 )
-
-create_objects_config: list[CreateObjectConfig] = [
-    CreateObjectConfig(
-        name='gold',
-        const=OtherInfo.GOLD_MINE.ID,
-        grouping=GroupingMethod.TIGHT,
-        number_of_objects=(4, 6),
-        temp_min_distance_group_placement=14,
-        min_distance_group_placement=4,
-        _max_potential_group_count=150,
-    ),
-    CreateObjectConfig(
-        name='stone',
-        const=OtherInfo.STONE_MINE.ID,
-        grouping=GroupingMethod.TIGHT,
-        number_of_objects=(3, 4),
-        temp_min_distance_group_placement=16,
-        min_distance_group_placement=4,
-        _max_potential_group_count=150,
-    ),
-    CreateObjectConfig(
-        name='berries',
-        const=OtherInfo.FORAGE_BUSH.ID,
-        grouping=GroupingMethod.TIGHT,
-        number_of_objects=(5, 6),
-        temp_min_distance_group_placement=22,
-        min_distance_group_placement=5,
-        _max_potential_group_count=60,
-    ),
-    CreateObjectConfig(
-        name='deer',
-        const=UnitInfo.DEER.ID,
-        grouping=GroupingMethod.LOOSE,
-        number_of_objects=(3, 4),
-        temp_min_distance_group_placement=20,
-        min_distance_group_placement=3,
-        _max_potential_group_count=60,
-    ),
-    CreateObjectConfig(
-        name='relic',
-        const=OtherInfo.RELIC.ID,
-        number_of_objects=1,
-        temp_min_distance_group_placement=26,
-        min_distance_group_placement=1,
-        _max_potential_group_count=20,
-    ),
-]
 
 asr = AoE2ScenarioRms(scenario)
 asr.create_objects(create_objects_config, grid_map)
