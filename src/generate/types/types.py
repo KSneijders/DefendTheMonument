@@ -1,6 +1,6 @@
 from AoE2ScenarioParser.datasets.buildings import BuildingInfo
 
-from src.implement.events.events import Event
+from src.generate.events.events import Event
 
 SectionType = dict[BuildingInfo, list[list[Event]]]
 

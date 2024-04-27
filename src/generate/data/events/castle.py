@@ -1,7 +1,7 @@
 from AoE2ScenarioParser.datasets.techs import TechInfo
 from AoE2ScenarioParser.datasets.units import UnitInfo
 
-from src.implement.events.events import Create, ResearchDependency, Event, Research
+from src.generate.events.events import Create, ResearchDependency, Event, Research
 
 castle_techs: list[Event] = [
     # ResearchDependency(TechInfo.CASTLE_AGE),

@@ -1,7 +1,7 @@
 from AoE2ScenarioParser.datasets.techs import TechInfo
 from AoE2ScenarioParser.datasets.units import UnitInfo
 
-from src.implement.events.events import Create, ResearchDependency, Research, Event
+from src.generate.events.events import Create, ResearchDependency, Research, Event
 
 monastery_techs: list[Event] = [
     # @formatter:off

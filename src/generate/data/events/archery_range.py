@@ -1,7 +1,7 @@
 from AoE2ScenarioParser.datasets.techs import TechInfo
 from AoE2ScenarioParser.datasets.units import UnitInfo
 
-from src.implement.events.events import Event, Research, ResearchDependency, Create
+from src.generate.events.events import Event, Research, ResearchDependency, Create
 
 archery_range_techs: list[Event] = [
     # @formatter:off

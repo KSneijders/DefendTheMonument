@@ -2,18 +2,18 @@ from AoE2ScenarioParser.datasets.buildings import BuildingInfo
 from AoE2ScenarioParser.datasets.techs import TechInfo
 from AoE2ScenarioParser.datasets.units import UnitInfo
 
-from src.implement.builders.spawner_builder import SpawnerBuilder
-from src.implement.data.events.archery_range import archery_range_techs, skirmisher_line, archer_line, \
+from src.generate.builders.spawner_builder import SpawnerBuilder
+from src.generate.data.events.archery_range import archery_range_techs, skirmisher_line, archer_line, \
     cavalry_archer_line, hand_cannoneer_line, elephant_archer_line
-from src.implement.data.events.barracks import barracks_techs, militia_line, spearman_line, eagle_line, condottiero_line
-from src.implement.data.events.castle import trebuchet_line, petard_line, castle_techs
-from src.implement.data.events.monastery import monastery_techs, monk_line
-from src.implement.data.events.siege_workshop import mangonel_line, scorpion_line, armored_elephant_line, ram_line, \
+from src.generate.data.events.barracks import barracks_techs, militia_line, spearman_line, eagle_line, condottiero_line
+from src.generate.data.events.castle import trebuchet_line, petard_line, castle_techs
+from src.generate.data.events.monastery import monastery_techs, monk_line
+from src.generate.data.events.siege_workshop import mangonel_line, scorpion_line, armored_elephant_line, ram_line, \
     bbc_line
-from src.implement.data.events.stable import battle_elephant_line, knight_line, scout_line, stable_techs, \
+from src.generate.data.events.stable import battle_elephant_line, knight_line, scout_line, stable_techs, \
     camel_rider_line, steppe_lancer_line
-from src.implement.events.events import Research, ResearchDependency, Create, Event
-from src.implement.types.types import SectionType
+from src.generate.events.events import Research, ResearchDependency, Create, Event
+from src.generate.types.types import SectionType
 
 ages: list[Event] = [
     # @formatter:off

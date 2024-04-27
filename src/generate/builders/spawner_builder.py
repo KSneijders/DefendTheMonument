@@ -9,9 +9,9 @@ from AoE2ScenarioParser.helper.pretty_format import pretty_format_name
 from AoE2ScenarioParser.objects.data_objects.trigger import Trigger
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
 
-from src.implement.events.events import Create, Research, ResearchDependency, Event
+from src.generate.events.events import Create, Research, ResearchDependency, Event
 from src.support.time import Time
-from src.implement.types.types import SectionType
+from src.generate.types.types import SectionType
 
 
 class SpawnerBuilder:

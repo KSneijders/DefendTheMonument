@@ -1,7 +1,7 @@
 from AoE2ScenarioParser.datasets.techs import TechInfo
 from AoE2ScenarioParser.datasets.units import UnitInfo
 
-from src.implement.events.events import Research, ResearchDependency, Create, Event
+from src.generate.events.events import Research, ResearchDependency, Create, Event
 
 barracks_techs: list[Event] = [
     # @formatter:off
