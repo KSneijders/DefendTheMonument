@@ -37,10 +37,10 @@ petard_line: list[Event] = [
 trebuchet_line: list[Event] = [
     # @formatter:off
     ResearchDependency(TechInfo.IMPERIAL_AGE),
-    Create(UnitInfo.TREBUCHET, time='00:00', rate=1),
-    Create(UnitInfo.TREBUCHET, time='05:00', rate=3),
-    Create(UnitInfo.TREBUCHET, time='10:00', rate=5),
-    Create(UnitInfo.TREBUCHET, time='15:00', rate=8),
-    Create(UnitInfo.TREBUCHET, time='20:00', rate=10),
+    Create(UnitInfo.TREBUCHET_PACKED, time='00:00', rate=1),
+    Create(UnitInfo.TREBUCHET_PACKED, time='05:00', rate=3),
+    Create(UnitInfo.TREBUCHET_PACKED, time='10:00', rate=5),
+    Create(UnitInfo.TREBUCHET_PACKED, time='15:00', rate=8),
+    Create(UnitInfo.TREBUCHET_PACKED, time='20:00', rate=10),
     # @formatter:on
 ]
