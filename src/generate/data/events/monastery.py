@@ -26,7 +26,21 @@ monastery_techs: list[Event] = [
 monk_line: list[Event] = [
     ResearchDependency(TechInfo.CASTLE_AGE),
 
-    Create(UnitInfo.MONK, time='02:00', rate=3),
-    Create(UnitInfo.MONK, time='06:00', rate=6),
-    Create(UnitInfo.MONK, time='10:00', rate=9),
+    Create(UnitInfo.MONK, time='01:00', rate=1),
+    Create(UnitInfo.MONK, time='06:00', rate=3),
+    Create(UnitInfo.MONK, time='10:00', rate=5),
+    Create(UnitInfo.MONK, time='16:00', rate=7),
+]
+
+missionary_line: list[Event] = [
+    ResearchDependency(TechInfo.CASTLE_AGE),
+
+    Create(UnitInfo.MISSIONARY, time='00:00', rate=1),
+    Create(UnitInfo.MISSIONARY, time='09:00', rate=2),
+    Create(UnitInfo.MISSIONARY, time='17:00', rate=3),
+
+    ResearchDependency(TechInfo.IMPERIAL_AGE),
+
+    Create(UnitInfo.MISSIONARY, time='07:00', rate=5),
+    Create(UnitInfo.MISSIONARY, time='13:00', rate=7),
 ]

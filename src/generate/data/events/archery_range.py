@@ -91,3 +91,16 @@ hand_cannoneer_line: list[Event] = [
     Create(UnitInfo.HAND_CANNONEER, time='18:00', rate=12),
     # @formatter:on
 ]
+
+genitour_line: list[Event] = [
+    # @formatter:off
+    ResearchDependency(TechInfo.CASTLE_AGE),
+    Create(UnitInfo.GENITOUR,         time='03:00', rate=2),
+    Create(UnitInfo.GENITOUR,         time='09:00', rate=6),
+    Create(UnitInfo.GENITOUR,         time='17:00', rate=9),
+
+    ResearchDependency(TechInfo.IMPERIAL_AGE),
+    Create(UnitInfo.GENITOUR,         time='06:00', rate=12),
+    Research(TechInfo.ELITE_GENITOUR, time='06:00'),
+    # @formatter:on
+]

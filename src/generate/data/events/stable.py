@@ -44,19 +44,26 @@ knight_line: list[Event] = [
     Research(TechInfo.CAVALIER, time='05:00'),
     Create(UnitInfo.KNIGHT,     time='16:00', rate=12),
     Research(TechInfo.PALADIN,  time='18:00'),
+    # TODO: Research(TechInfo.SAVAR,    time='18:00'),
     # @formatter:on
 ]
 
 camel_rider_line: list[Event] = [
     # @formatter:off
+    ResearchDependency(TechInfo.FEUDAL_AGE),
+    Create(UnitInfo.CAMEL_SCOUT,            time='01:00', rate=1),
+    Create(UnitInfo.CAMEL_SCOUT,            time='04:00', rate=2),
+    Create(UnitInfo.CAMEL_SCOUT,            time='08:00', rate=3),
+
     ResearchDependency(TechInfo.CASTLE_AGE),
-    Create(UnitInfo.CAMEL_RIDER,         time='00:00', rate=2),
-    Create(UnitInfo.CAMEL_RIDER,         time='09:00', rate=4),
-    Create(UnitInfo.CAMEL_RIDER,         time='14:00', rate=6),
+    Create(UnitInfo.CAMEL_RIDER,            time='00:00', rate=2),
+    Create(UnitInfo.CAMEL_RIDER,            time='09:00', rate=4),
+    Create(UnitInfo.CAMEL_RIDER,            time='14:00', rate=6),
 
     ResearchDependency(TechInfo.IMPERIAL_AGE),
-    Research(TechInfo.HEAVY_CAMEL_RIDER, time='08:00'),
-    Create(UnitInfo.CAMEL_RIDER,         time='09:00', rate=10),
+    Research(TechInfo.HEAVY_CAMEL_RIDER,    time='08:00'),
+    Create(UnitInfo.CAMEL_RIDER,            time='09:00', rate=10),
+    Research(TechInfo.IMPERIAL_CAMEL_RIDER, time='17:00'),
     # @formatter:on
 ]
 
