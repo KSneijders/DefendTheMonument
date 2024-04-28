@@ -80,6 +80,10 @@ map_revealers_trigger = tm.add_trigger('Remove map revealers & allied vision')
 for player in players:
     map_revealers_trigger.new_effect.remove_object(OtherInfo.MAP_REVEALER_GIANT.ID, player, **coords)
 
+# Give AI full map vision
+entire_map_grid = area.copy().use_pattern_grid(block_size=1, gap_size=10)
+for tile in entire_map_grid.to_coords():
+    um.add_unit(PlayerId.EIGHT, unit_const=OtherInfo.MAP_REVEALER_GIANT.ID, tile=tile)
 
 for player in players:
     for target in players:
