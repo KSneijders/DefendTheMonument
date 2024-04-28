@@ -3,7 +3,19 @@ from AoE2ScenarioParser.datasets.units import UnitInfo
 from AoE2ScenarioRms.enums import GroupingMethod
 from AoE2ScenarioRms.rms import CreateObjectConfig
 
-create_objects_config: list[CreateObjectConfig] = [
+starting_area_additional_objects_config: list[CreateObjectConfig] = [
+    CreateObjectConfig(
+        name='local_deer',
+        const=UnitInfo.DEER.ID,
+        grouping=GroupingMethod.LOOSE,
+        number_of_objects=(3, 4),
+        temp_min_distance_group_placement=15,
+        min_distance_group_placement=3,
+        _max_potential_group_count=50,
+    ),
+]
+
+global_map_objects_config: list[CreateObjectConfig] = [
     CreateObjectConfig(
         name='gold',
         const=OtherInfo.GOLD_MINE.ID,

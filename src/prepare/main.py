@@ -12,11 +12,12 @@ from AoE2ScenarioParser.datasets.units import UnitInfo
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
 from AoE2ScenarioRms import AoE2ScenarioRms
 from AoE2ScenarioRms.debug import ApplyXsPrint
+from AoE2ScenarioRms.debug.apply_state_as_black import ApplyAvailableAsBlack
 from AoE2ScenarioRms.flags import ObjectClear, ObjectMark
 from AoE2ScenarioRms.util import ScenarioUtil, GridMapFactory
 
 from src.local_config import folder_de
-from src.prepare.rms import create_objects_config
+from src.prepare.rms import global_map_objects_config, starting_area_additional_objects_config
 from src.support.values import orientations
 
 if __name__ != '__main__':
@@ -223,14 +224,23 @@ mm.set_elevation(0, **center.copy().expand(10).to_dict(prefix=''))
 
 # ####### RANDOM RESOURCE SPAWNING ######## #
 
+asr = AoE2ScenarioRms(scenario)
+
+# Starting deer
+grid_map = GridMapFactory.block(
+    scenario=scenario,
+    object_marks=ObjectMark.TREES | ObjectMark.CLIFFS,
+    area=scenario.new.area().select_entire_map().use_only_edge(line_width=math.floor((scenario.map_manager.map_size / 2) - (CLEAR_AREA + 1)))
+)
+asr.create_objects(starting_area_additional_objects_config, grid_map)
+
+# Global resources
 grid_map = GridMapFactory.block(
     scenario=scenario,
     object_marks=ObjectMark.TREES | ObjectMark.CLIFFS,
     area=scenario.new.area().select_entire_map().use_only_edge(line_width=math.ceil(scenario.map_manager.map_size / 8))
 )
-
-asr = AoE2ScenarioRms(scenario)
-asr.create_objects(create_objects_config, grid_map)
+asr.create_objects(global_map_objects_config, grid_map)
 
 ApplyXsPrint(asr)
 
