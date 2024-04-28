@@ -8,6 +8,8 @@ from src.generate.data.event_data import sections
 from src.generate.data.town_data import spawn_attempts
 from src.local_config import folder_de
 
+print("\n", "\n", "Generation!", "\n")
+
 filename = "!prepared_defend1"
 scenario = AoE2DEScenario.from_file(f"{folder_de}{filename}.aoe2scenario")
 tm, um, mm, xm, pm, msm = scenario.trigger_manager, scenario.unit_manager, scenario.map_manager, scenario.xs_manager, \

@@ -37,6 +37,9 @@ def random_vil() -> int:
 #     SCENARIO PREPARATION     #
 ################################
 
+print("\n", "\n", "Preparation!", "\n")
+
+TerrainId.tree_terrains()
 
 filename = "defend1"
 scenario = AoE2DEScenario.from_file(f"{folder_de}{filename}.aoe2scenario")
