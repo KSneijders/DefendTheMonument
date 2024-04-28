@@ -166,3 +166,13 @@ Multiple win conditions would be nice.
   - Kill a gen building = +2
   - Kill a castle       = +5
   - Acquire a relic     = +1
+
+# Ideas
+
+- Split the spawn areas in chunks and fortify to force units from all angles
+- [REQUIRED DATAMOD] Units from Dark Age with focus walls over units (like rams)?
+- Petard with less blast damage in Dark Age
+- Randomize player starting positions
+- Instantly delete all p8 buildings in center (delete converted buildings)
+  - Maybe filter potential buildings p8 might eventually get in map generation?
+- SLINGER
