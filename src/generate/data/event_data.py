@@ -3,7 +3,7 @@ from AoE2ScenarioParser.datasets.techs import TechInfo
 
 from src.generate.builders.spawner_builder import SpawnerBuilder
 from src.generate.data.events.archery_range import archery_range_techs, skirmisher_line, archer_line, \
-    cavalry_archer_line, hand_cannoneer_line, elephant_archer_line, genitour_line
+    cavalry_archer_line, hand_cannoneer_line, elephant_archer_line, genitour_line, slinger_line
 from src.generate.data.events.barracks import barracks_techs, militia_line, spearman_line, eagle_line, condottiero_line
 from src.generate.data.events.castle import trebuchet_line, petard_line, castle_techs
 from src.generate.data.events.monastery import monastery_techs, monk_line, missionary_line
@@ -75,7 +75,7 @@ sections: SectionType = {
     BuildingInfo.UNIVERSITY:     [university_techs],
 
     BuildingInfo.BARRACKS:       [barracks_techs, militia_line, spearman_line, eagle_line, condottiero_line],
-    BuildingInfo.ARCHERY_RANGE:  [archery_range_techs, archer_line, skirmisher_line, cavalry_archer_line, elephant_archer_line, hand_cannoneer_line, genitour_line],
+    BuildingInfo.ARCHERY_RANGE:  [archery_range_techs, archer_line, skirmisher_line, cavalry_archer_line, elephant_archer_line, hand_cannoneer_line, genitour_line, slinger_line],
     BuildingInfo.STABLE:         [stable_techs, scout_line, knight_line, camel_rider_line, steppe_lancer_line, battle_elephant_line],
     BuildingInfo.SIEGE_WORKSHOP: [ram_line, armored_elephant_line, mangonel_line, scorpion_line, bbc_line],
     BuildingInfo.MONASTERY:      [monastery_techs, monk_line, missionary_line],

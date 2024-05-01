@@ -175,4 +175,3 @@ Multiple win conditions would be nice.
 - Randomize player starting positions
 - Instantly delete all p8 buildings in center (delete converted buildings)
   - Maybe filter potential buildings p8 might eventually get in map generation?
-- SLINGER

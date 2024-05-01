@@ -104,3 +104,15 @@ genitour_line: list[Event] = [
     Research(TechInfo.ELITE_GENITOUR, time='06:00'),
     # @formatter:on
 ]
+
+slinger_line: list[Event] = [
+    # @formatter:off
+    ResearchDependency(TechInfo.CASTLE_AGE),
+    Create(UnitInfo.SLINGER, time='03:00', rate=3),
+    Create(UnitInfo.SLINGER, time='07:00', rate=5),
+    Create(UnitInfo.SLINGER, time='14:00', rate=8),
+
+    ResearchDependency(TechInfo.IMPERIAL_AGE),
+    Create(UnitInfo.SLINGER, time='07:00', rate=12),
+    # @formatter:on
+]
