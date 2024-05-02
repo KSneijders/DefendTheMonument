@@ -1,5 +1,6 @@
 import copy
 import math
+from pathlib import Path
 from random import Random
 
 from AoE2ScenarioParser.datasets.buildings import BuildingInfo
@@ -12,7 +13,6 @@ from AoE2ScenarioParser.datasets.units import UnitInfo
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
 from AoE2ScenarioRms import AoE2ScenarioRms
 from AoE2ScenarioRms.debug import ApplyXsPrint
-from AoE2ScenarioRms.debug.apply_state_as_black import ApplyAvailableAsBlack
 from AoE2ScenarioRms.flags import ObjectClear, ObjectMark
 from AoE2ScenarioRms.util import ScenarioUtil, GridMapFactory
 
@@ -46,6 +46,8 @@ scenario = AoE2DEScenario.from_file(f"{folder_de}{filename}.aoe2scenario")
 tm, um, mm, xm, pm, msm = scenario.trigger_manager, scenario.unit_manager, scenario.map_manager, scenario.xs_manager, \
     scenario.player_manager, scenario.message_manager
 
+xm.initialise_xs_trigger()
+
 # ####### UNITS ######## #
 
 CLEAR_AREA = 24
@@ -60,8 +62,8 @@ area = scenario.new.area().select_entire_map()
 center = area.copy().size(1).expand(CLEAR_AREA)
 center_no_build = area.copy().select_entire_map().size(0).expand(NO_BUILD_AREA)
 
-for unit in um.get_units_in_area(**center.to_dict(prefix='')):
-    um.remove_unit(unit=unit)
+for unit_const in um.get_units_in_area(**center.to_dict(prefix='')):
+    um.remove_unit(unit=unit_const)
 
 center_1x1 = center.copy().size(1)
 center_tile = center_1x1.corner1
@@ -94,7 +96,9 @@ for player in players:
             continue
         map_revealers_trigger.new_effect.set_player_visibility(player, target, VisibilityState.VISIBLE)
 
-change_view_trigger = tm.add_trigger('Change view trigger')
+
+disable_trigger = tm.add_trigger(f'Disable random player placements')
+disable_trigger.new_condition.timer(3)
 for player in players:
     um.add_unit(player, unit_const=OtherInfo.MAP_REVEALER_GIANT.ID, tile=center_tile)
 
@@ -107,30 +111,24 @@ for player in players:
     # scenario.sections[SectionName.UNITS.value].player_data_3[player].editor_camera_x = math.floor(x)
     # scenario.sections[SectionName.UNITS.value].player_data_3[player].editor_camera_y = math.floor(y)
 
-    change_view_trigger.new_effect.change_view(
-        quantity=0,
-        source_player=player,
-        location_x=math.floor(x),
-        location_y=math.floor(y),
-    )
-
+    # Spawn villagers
+    villagers = []
     for i in range(len(orientations)):
         xoffset = orientations[i][0] / 2
         yoffset = orientations[i][1] / 2
 
-        um.add_unit(player=player, unit_const=random_vil(), x=x + xoffset, y=y + yoffset)
+        villager = um.add_unit(player=player, unit_const=random_vil(), x=x + xoffset, y=y + yoffset)
+        villagers.append(villager)
 
-    # Spawn starting boars
+    # Spawn starting resources
     starting_units_per_player = [
-        (UnitInfo.JAVELINA.ID, 1, PlayerId.GAIA),
-        (UnitInfo.JAVELINA.ID, 1, PlayerId.GAIA),
-        (UnitInfo.SHEEP.ID, 8, None),
+        (UnitInfo.JAVELINA.ID, 1),
+        (UnitInfo.JAVELINA.ID, 1),
+        (UnitInfo.SHEEP.ID, 8),
     ]
 
-    for unit, repeat, target_player in starting_units_per_player:
-        if target_player is None:
-            target_player = player
-
+    sheep = []
+    for unit_const, repeat in starting_units_per_player:
         while True:
             sx = (_random.random() * 10 - 5)
             sy = (_random.random() * 10 - 5)
@@ -147,7 +145,31 @@ for player in players:
             fx = x + sx + (xoffset / 1.4)
             fy = y + sy + (yoffset / 1.4)
 
-            um.add_unit(player=target_player, unit_const=unit, x=fx, y=fy, rotation=_random.random() * math.pi * 2)
+            unit = um.add_unit(player=PlayerId.GAIA, unit_const=unit_const, x=fx, y=fy, rotation=_random.random() * math.pi * 2)
+            if unit_const == UnitInfo.SHEEP.ID:
+                sheep.append(unit)
+
+    # Add triggers & script for random player placement
+    for target_player in players:
+        trigger = tm.add_trigger(f'P{target_player} [Section {player}]')
+        func = (
+            f'bool __player_P{target_player}_spawn_section_{player}() {{'
+            f'return (playerShuffleFinished && xsArrayGetInt(playerPositions, {player - 1}) == {target_player - 1});'
+            f'}}'
+        )
+        trigger.new_condition.script_call(func)
+        trigger.new_effect.change_ownership(
+            selected_object_ids=[unit.reference_id for unit in villagers + sheep],
+            target_player=target_player,
+        )
+        trigger.new_effect.change_view(
+            quantity=0,
+            source_player=target_player,
+            location_x=math.floor(x),
+            location_y=math.floor(y),
+        )
+
+        disable_trigger.new_effect.deactivate_trigger(trigger.trigger_id)
 
 # ####### PLAYERS & STARTING RESOURCE (DETECTION) ######## #
 
@@ -250,5 +272,9 @@ grid_map = GridMapFactory.block(
 asr.create_objects(global_map_objects_config, grid_map)
 
 ApplyXsPrint(asr)
+
+# Add the conditional logic for random player placement
+random_players_file_path = Path(__file__).parent / 'xs' / 'random_players.xs'
+xm.add_script(xs_file_path=str(random_players_file_path))
 
 scenario.write_to_file(f"{folder_de}!prepared_{filename}.aoe2scenario")
